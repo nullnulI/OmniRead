@@ -1,0 +1,93 @@
+.footer {
+	background-color: rgb(31 41 55);
+	color: rgb(255 255 255);
+	padding: 2rem 0;
+}
+
+.container {
+	margin: 0 auto;
+	max-width: 80rem;
+	padding: 0 1rem;
+}
+
+.layout {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 2rem;
+}
+
+.brandGroup {
+	display: flex;
+	gap: 2rem;
+}
+
+.heading {
+	margin-bottom: 1rem;
+	font-size: 1.125rem;
+	font-weight: 700;
+}
+
+.description {
+	color: rgb(156 163 175);
+}
+
+.categoriesList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.categoryLink {
+	color: inherit;
+	text-decoration: none;
+	transition: color 150ms ease;
+}
+
+.categoryLink:hover {
+	color: rgb(209 213 219);
+}
+
+.contactGroup {
+	flex-shrink: 0;
+}
+
+.socialLinks {
+	display: flex;
+	gap: 1rem;
+}
+
+.socialLink {
+	color: inherit;
+	transition: color 150ms ease;
+}
+
+.socialLink:hover {
+	color: rgb(209 213 219);
+}
+
+.icon {
+	height: 1.25rem;
+	width: 1.25rem;
+	fill: currentColor;
+}
+
+.meta {
+	margin-top: 2rem;
+	text-align: center;
+	color: rgb(107 114 128);
+}
+
+@media (max-width: 768px) {
+	.layout {
+		flex-direction: column;
+	}
+
+	.brandGroup {
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+}

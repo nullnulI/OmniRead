@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: omniread-backend
+  datasource:
+    url: ${OMNIREAD_DATASOURCE_URL:jdbc:mysql://localhost:3306/omniread?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${OMNIREAD_DATASOURCE_USERNAME:omniread}
+    password: ${OMNIREAD_DATASOURCE_PASSWORD:change-me}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  redis:
+    host: ${OMNIREAD_REDIS_HOST:localhost}
+    port: ${OMNIREAD_REDIS_PORT:6379}
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+security:
+  jwt:
+    secret: ${OMNIREAD_JWT_SECRET:change-this-development-jwt-secret-before-real-use}
+    expiration-minutes: ${OMNIREAD_JWT_EXPIRATION_MINUTES:120}
+
+omniread:
+  bootstrap:
+    admin:
+      enabled: ${OMNIREAD_BOOTSTRAP_ADMIN_ENABLED:true}
+      email: ${OMNIREAD_BOOTSTRAP_ADMIN_EMAIL:admin@omniread.local}
+      password: ${OMNIREAD_BOOTSTRAP_ADMIN_PASSWORD:change-me-admin-password}
+  seed:
+    demo:
+      enabled: ${OMNIREAD_SEED_DEMO_ENABLED:true}
+      inventory-admin:
+        password: ${OMNIREAD_DEMO_INVENTORY_PASSWORD:change-me-inventory-password}
+      supplier:
+        password: ${OMNIREAD_DEMO_SUPPLIER_PASSWORD:change-me-supplier-password}
+      customer:
+        password: ${OMNIREAD_DEMO_CUSTOMER_PASSWORD:change-me-customer-password}

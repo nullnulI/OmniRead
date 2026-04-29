@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: ${OMNIREAD_DATASOURCE_URL:jdbc:mysql://localhost:3306/omniread?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${OMNIREAD_DATASOURCE_USERNAME:omniread}
+    password: ${OMNIREAD_DATASOURCE_PASSWORD:change-me}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  redis:
+    host: ${OMNIREAD_REDIS_HOST:localhost}
+    port: ${OMNIREAD_REDIS_PORT:6379}
+
+omniread:
+  bootstrap:
+    admin:
+      enabled: ${OMNIREAD_BOOTSTRAP_ADMIN_ENABLED:true}
+      email: ${OMNIREAD_BOOTSTRAP_ADMIN_EMAIL:admin@omniread.local}
+      password: ${OMNIREAD_BOOTSTRAP_ADMIN_PASSWORD:change-me-admin-password}
+  seed:
+    demo:
+      enabled: ${OMNIREAD_SEED_DEMO_ENABLED:true}
+      inventory-admin:
+        password: ${OMNIREAD_DEMO_INVENTORY_PASSWORD:change-me-inventory-password}
+      supplier:
+        password: ${OMNIREAD_DEMO_SUPPLIER_PASSWORD:change-me-supplier-password}
+      customer:
+        password: ${OMNIREAD_DEMO_CUSTOMER_PASSWORD:change-me-customer-password}

@@ -1,0 +1,78 @@
+.card {
+	max-width: 640px;
+	width: 100%;
+	border: 1px solid rgb(203 213 225);
+	border-radius: 0.75rem;
+	background-color: rgb(255 255 255);
+	box-shadow: 0 10px 25px -15px rgb(15 23 42 / 0.35);
+	padding: 2rem;
+}
+
+.badge {
+	display: inline-block;
+	padding: 0.25rem 0.625rem;
+	border-radius: 9999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	background-color: rgb(239 246 255);
+	color: rgb(30 64 175);
+	margin-bottom: 1rem;
+}
+
+.title {
+	font-size: clamp(1.5rem, 4vw, 2rem);
+	line-height: 1.2;
+	font-weight: 700;
+	color: rgb(15 23 42);
+	margin-bottom: 0.75rem;
+}
+
+.description {
+	font-size: 1rem;
+	line-height: 1.6;
+	color: rgb(71 85 105);
+	margin-bottom: 1.5rem;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+.primary,
+.secondary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.625rem 1rem;
+	border-radius: 0.5rem;
+	font-size: 0.95rem;
+	font-weight: 600;
+	transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.primary {
+	background-color: rgb(30 64 175);
+	color: rgb(255 255 255);
+}
+
+.secondary {
+	border: 1px solid rgb(203 213 225);
+	background-color: rgb(248 250 252);
+	color: rgb(30 41 59);
+}
+
+.primary:hover,
+.secondary:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 8px 18px -12px rgb(15 23 42 / 0.5);
+}
+
+@media (max-width: 640px) {
+	.card {
+		padding: 1.25rem;
+	}
+}

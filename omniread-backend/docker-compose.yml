@@ -1,0 +1,30 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: omniread-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-change-me-local-only}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-omniread}
+      TZ: ${TZ:-Asia/Shanghai}
+    ports:
+      - "3306:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - omniread_mysql_data:/var/lib/mysql
+      - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  redis:
+    image: redis:7-alpine
+    container_name: omniread-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - omniread_redis_data:/data
+
+volumes:
+  omniread_mysql_data:
+  omniread_redis_data:

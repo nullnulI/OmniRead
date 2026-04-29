@@ -1,0 +1,100 @@
+.section {
+	position: sticky;
+	top: 1.5rem;
+}
+
+.card {
+	border: 1px solid rgb(226 232 240);
+	border-radius: 1rem;
+	background-color: rgb(255 255 255);
+	padding: 1.25rem;
+	box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+}
+
+.heading {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.summaryList {
+	margin-top: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	font-size: 0.875rem;
+}
+
+.summaryRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	color: rgb(71 85 105);
+}
+
+.divider {
+	margin: 1.25rem 0;
+	border-top: 1px solid rgb(226 232 240);
+}
+
+.totalRow {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.totalLabel {
+	font-size: 1rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.totalValue {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.paymentBox {
+	border: 1px solid rgb(219 234 254);
+	border-radius: 0.5rem;
+	background: rgb(239 246 255);
+	margin: 1rem 0;
+	padding: 0.75rem;
+}
+
+.paymentTitle {
+	color: rgb(30 64 175);
+	font-size: 0.875rem;
+	font-weight: 700;
+	margin: 0 0 0.25rem;
+}
+
+.checkoutButton {
+	margin-top: 1.25rem;
+	width: 100%;
+	border: 0;
+	border-radius: 9999px;
+	background-color: rgb(15 23 42);
+	padding: 0.75rem 1rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: rgb(255 255 255);
+	transition: background-color 150ms ease;
+}
+
+.checkoutButton:hover {
+	background-color: rgb(30 41 59);
+}
+
+.note {
+	margin-top: 0.75rem;
+	font-size: 0.75rem;
+	color: rgb(100 116 139);
+}
+
+.errorText {
+	margin-top: 0.75rem;
+	font-size: 0.75rem;
+	color: rgb(190 18 60);
+}

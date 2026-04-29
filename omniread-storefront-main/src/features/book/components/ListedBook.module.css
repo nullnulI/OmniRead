@@ -1,0 +1,206 @@
+.section {
+	display: grid;
+	gap: 1.5rem;
+	border: 1px solid rgb(226 232 240);
+	border-radius: 1.5rem;
+	background-color: rgb(255 255 255);
+	padding: 1.25rem;
+	box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+}
+
+.coverPanel {
+	border: 1px solid rgb(226 232 240);
+	border-radius: 1rem;
+	background-color: rgb(248 250 252);
+	padding: 0.75rem;
+}
+
+.coverFrame {
+	position: relative;
+	margin: 0 auto;
+	aspect-ratio: 3 / 4;
+	width: 100%;
+	max-width: 260px;
+	overflow: hidden;
+	border-radius: 0.75rem;
+	box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+}
+
+.coverImage {
+	object-fit: cover;
+}
+
+.details {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.kicker {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgb(100 116 139);
+}
+
+.title {
+	margin-top: 0.25rem;
+	font-size: 1.875rem;
+	font-weight: 600;
+	line-height: 1.2;
+	color: rgb(15 23 42);
+}
+
+.authorLine {
+	margin-top: 0.5rem;
+	font-size: 0.875rem;
+	color: rgb(71 85 105);
+}
+
+.description {
+	font-size: 0.875rem;
+	line-height: 1.75;
+	color: rgb(51 65 85);
+}
+
+.metaGrid {
+	display: grid;
+	gap: 0.75rem;
+	border-radius: 1rem;
+	background-color: rgb(248 250 252);
+	padding: 1rem;
+	font-size: 0.875rem;
+	color: rgb(51 65 85);
+}
+
+.metaLabel {
+	font-weight: 500;
+	color: rgb(15 23 42);
+}
+
+.aside {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	border: 1px solid rgb(226 232 240);
+	border-radius: 1rem;
+	background-color: rgb(248 250 252);
+	padding: 1rem;
+}
+
+.asideTitle {
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.optionCardPrimary {
+	border: 1px solid rgb(167 243 208);
+	border-radius: 0.75rem;
+	background-color: rgb(255 255 255);
+	padding: 1rem;
+}
+
+.optionCardSecondary {
+	border: 1px solid rgb(254 215 170);
+	border-radius: 0.75rem;
+	background-color: rgb(255 255 255);
+	padding: 1rem;
+}
+
+.optionKickerPrimary,
+.optionKickerSecondary {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+.optionKickerPrimary {
+	color: rgb(21 128 61);
+}
+
+.optionKickerSecondary {
+	color: rgb(180 83 9);
+}
+
+.price {
+	margin-top: 0.5rem;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.optionDescription {
+	margin-top: 0.5rem;
+	font-size: 0.875rem;
+	color: rgb(71 85 105);
+}
+
+.stockLabel {
+	font-weight: 500;
+	color: rgb(15 23 42);
+}
+
+.buttonGrid {
+	margin-top: 1rem;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.5rem;
+}
+
+.secondaryButton {
+	border: 1px solid rgb(203 213 225);
+	border-radius: 9999px;
+	background-color: rgb(255 255 255);
+	padding: 0.5rem 0.75rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: rgb(51 65 85);
+	transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.secondaryButton:hover {
+	background-color: rgb(241 245 249);
+}
+
+.secondaryButton:disabled {
+	cursor: not-allowed;
+	opacity: 0.4;
+}
+
+.primaryButton {
+	border: 0;
+	border-radius: 9999px;
+	background-color: rgb(15 23 42);
+	padding: 0.5rem 0.75rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: rgb(255 255 255);
+	text-align: center;
+	text-decoration: none;
+	transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.primaryButton:hover {
+	background-color: rgb(30 41 59);
+}
+
+.primaryButton:disabled {
+	cursor: not-allowed;
+	opacity: 0.4;
+}
+
+@media (min-width: 640px) {
+	.metaGrid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	.section {
+		grid-template-columns: 320px minmax(0, 1fr) 320px;
+		padding: 1.5rem;
+	}
+}

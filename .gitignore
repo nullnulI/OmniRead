@@ -1,0 +1,28 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# Environment and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# Backend
+omniread-backend/target/
+
+# Frontend
+omniread-storefront-main/node_modules/
+omniread-storefront-main/.next/
+omniread-storefront-main/out/
+omniread-storefront-main/build/
+omniread-storefront-main/coverage/
+omniread-storefront-main/next-env.d.ts
+omniread-storefront-main/*.tsbuildinfo
+
+# Local runtime data / tools
+omniread-mysql8-data/
+tools/

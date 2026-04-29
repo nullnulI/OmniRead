@@ -1,0 +1,158 @@
+.section {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.kicker {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: rgb(100 116 139);
+}
+
+.title {
+	margin-top: 0.25rem;
+	font-size: 1.875rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.description {
+	margin-top: 0.5rem;
+	font-size: 0.875rem;
+	color: rgb(71 85 105);
+}
+
+.list {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	border: 1px solid rgb(226 232 240);
+	border-radius: 1rem;
+	background-color: rgb(255 255 255);
+	padding: 1rem;
+	box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+}
+
+.coverFrame {
+	position: relative;
+	height: 7rem;
+	width: 5rem;
+	flex-shrink: 0;
+	overflow: hidden;
+	border-radius: 0.75rem;
+}
+
+.coverImage {
+	object-fit: cover;
+}
+
+.content {
+	min-width: 0;
+	flex: 1 1 0%;
+}
+
+.headerRow {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 0.75rem;
+}
+
+.title {
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.author {
+	margin-top: 0.25rem;
+	font-size: 0.875rem;
+	color: rgb(71 85 105);
+}
+
+.typeBadge {
+	margin-top: 0.5rem;
+	display: inline-flex;
+	border-radius: 9999px;
+	background-color: rgb(241 245 249);
+	padding: 0.25rem 0.625rem;
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: rgb(71 85 105);
+}
+
+.price {
+	font-size: 1rem;
+	font-weight: 600;
+	color: rgb(15 23 42);
+}
+
+.footerRow {
+	margin-top: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.quantityControl {
+	display: inline-flex;
+	align-items: center;
+	border: 1px solid rgb(226 232 240);
+	border-radius: 9999px;
+	background-color: rgb(255 255 255);
+	padding: 0.25rem 0.5rem;
+	font-size: 0.875rem;
+	color: rgb(51 65 85);
+}
+
+.quantityButton {
+	height: 1.75rem;
+	width: 1.75rem;
+	border: 0;
+	border-radius: 9999px;
+	background-color: transparent;
+	font-size: 1.125rem;
+	line-height: 1;
+	color: rgb(100 116 139);
+	transition: background-color 150ms ease;
+}
+
+.quantityButton:hover {
+	background-color: rgb(241 245 249);
+}
+
+.quantity {
+	width: 2rem;
+	text-align: center;
+	font-weight: 500;
+}
+
+.removeButton {
+	border: 0;
+	background: transparent;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: rgb(225 29 72);
+	transition: color 150ms ease;
+}
+
+.removeButton:hover {
+	color: rgb(190 18 60);
+}
+
+@media (min-width: 640px) {
+	.card {
+		flex-direction: row;
+	}
+}
+

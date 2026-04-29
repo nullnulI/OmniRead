@@ -1,0 +1,49 @@
+.link {
+	display: block;
+}
+
+.article {
+	width: 150px;
+	flex-shrink: 0;
+	scroll-snap-align: start;
+}
+
+.coverFrame {
+	position: relative;
+	height: 225px;
+	overflow: hidden;
+	border: 1px solid rgb(226 232 240);
+	border-radius: 0.5rem;
+	background-color: rgb(255 255 255);
+	box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+	transition: transform 200ms, box-shadow 200ms;
+}
+
+.article:hover .coverFrame {
+	transform: translateY(-4px);
+	box-shadow:
+		0 10px 15px -3px rgb(15 23 42 / 0.1),
+		0 4px 6px -4px rgb(15 23 42 / 0.1);
+}
+
+.coverImage {
+	object-fit: cover;
+	transition: transform 300ms;
+}
+
+.article:hover .coverImage {
+	transform: scale(1.05);
+}
+
+.title {
+	margin-top: 0.75rem;
+	overflow: hidden;
+	display: -webkit-box;
+	line-clamp: 2;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	text-align: center;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: rgb(51 65 85);
+}
