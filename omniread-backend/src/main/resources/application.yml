@@ -45,3 +45,9 @@ omniread:
         password: ${OMNIREAD_DEMO_SUPPLIER_PASSWORD:change-me-supplier-password}
       customer:
         password: ${OMNIREAD_DEMO_CUSTOMER_PASSWORD:change-me-customer-password}
+  ai-service:
+    enabled: ${OMNIREAD_AI_ENABLED:true}
+    url: ${OMNIREAD_AI_SERVICE_URL:http://localhost:8081}
+  webhook:
+    procurement:
+      url: ${OMNIREAD_WEBHOOK_PROCUREMENT_URL:}

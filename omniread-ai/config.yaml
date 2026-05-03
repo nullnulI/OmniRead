@@ -1,0 +1,59 @@
+service:
+  port: 8081
+
+database:
+  url: mysql+pymysql://root:change-me-local-only@localhost:3306/omniread
+
+models:
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    feature_names:
+      - sales_velocity
+      - sales_std
+      - current_stock
+      - lead_time_days
+      - safety_stock
+      - days_since_last_order
+      - day_of_week_sin
+      - day_of_week_cos
+  holt_winters:
+    seasonal_periods: 7
+    trend: add
+    seasonal: add
+    smoothing_level: 0.2
+    smoothing_trend: 0.1
+    smoothing_seasonal: 0.3
+  naive_baseline:
+    fallback_stockout_day: 7
+
+ensemble:
+  temperature: 2.0
+  default_weights:
+    random_forest: 0.5
+    holt_winters: 0.3
+    naive_baseline: 0.2
+
+cold_start:
+  min_history_days: 14
+  short_history_days: 7
+  category_avg_lookback_days: 90
+  global_default_stockout_day: 7
+  global_default_risk: 0.5
+
+risk:
+  low_max: 0.25
+  medium_max: 0.50
+  high_max: 0.75
+  llm_trigger: 0.5
+
+procurement:
+  trigger_risk: 0.75
+
+training:
+  lookback_days: 90
+  min_samples: 30
+  test_size: 0.2
+
+model_version: ensemble-v1.4

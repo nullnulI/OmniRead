@@ -22,6 +22,7 @@ public class ProcurementResponse {
     private String externalRequestId;
     private LocalDateTime approvedAt;
     private LocalDateTime completedAt;
+    private LocalDateTime dispatchedAt;
 
     public static ProcurementResponse from(ProcurementRequest request) {
         return ProcurementResponse.builder()
@@ -37,6 +38,7 @@ public class ProcurementResponse {
             .externalRequestId(request.getExternalRequestId())
             .approvedAt(request.getApprovedAt())
             .completedAt(request.getCompletedAt())
+            .dispatchedAt(request.getDispatchedAt())
             .build();
     }
 }

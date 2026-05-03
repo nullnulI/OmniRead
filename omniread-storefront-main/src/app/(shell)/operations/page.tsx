@@ -12,6 +12,7 @@ import {
   fetchLowStockRecords,
   fetchMyProcurementRequests,
   fetchOperationProducts,
+  fetchPredictionAudit,
   fetchProcurementRequests,
   generateAllForecasts,
   updateInventoryStock,
@@ -20,9 +21,11 @@ import {
 } from "@/services/api/inventory";
 import { fetchAdminOrders, updateOrderStatus } from "@/services/api/order";
 import type {
+  AttributionMap,
   ForecastRecord,
   InventoryRecord,
   LowStockRecord,
+  PredictionAuditRecord,
   ProductPayload,
   ProcurementRequest,
   ProcurementStatus,
@@ -69,6 +72,18 @@ function riskClass(risk?: StockoutRisk) {
   if (risk === "MEDIUM") return `${styles.pill} ${styles.riskMedium}`;
   if (risk === "LOW") return `${styles.pill} ${styles.riskLow}`;
   return styles.pill;
+}
+
+function modelVersionClass(version?: string) {
+  if (!version) return styles.pill;
+  if (version.startsWith("ai-")) return `${styles.pill} ${styles.modelAi}`;
+  if (version.startsWith("rules-")) return `${styles.pill} ${styles.modelRules}`;
+  return styles.pill;
+}
+
+function formatConfidence(score?: number) {
+  if (score == null) return "—";
+  return `${(Number(score) * 100).toFixed(0)}%`;
 }
 
 function statusClass(status: ProcurementStatus) {
@@ -188,6 +203,8 @@ function OperationsPage() {
   const [isWorking, setIsWorking] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [audits, setAudits] = useState<Record<number, PredictionAuditRecord | null>>({});
+  const [expandedAudit, setExpandedAudit] = useState<number | null>(null);
 
   const selectedRow = useMemo(
     () => rows.find((row) => String(row.product.id) === selectedProductId),
@@ -217,10 +234,12 @@ function OperationsPage() {
 
     const productRows = await Promise.all(
       products.map(async (product) => {
-        const [inventory, forecasts] = await Promise.all([
+        const [inventory, forecasts, audit] = await Promise.all([
           fetchInventory(product.id).catch(() => null),
           fetchForecasts(product.id).catch(() => [] as ForecastRecord[]),
+          fetchPredictionAudit(product.id).catch(() => null),
         ]);
+        setAudits((prev) => ({ ...prev, [product.id]: audit }));
         return { product, inventory, forecasts };
       }),
     );
@@ -433,29 +452,34 @@ function OperationsPage() {
       {notice ? <p className={styles.notice}>{notice}</p> : null}
       {error ? <p className={styles.error}>{error}</p> : null}
 
-      {isAdmin ? (
-        <AdminDashboard
-          rows={rows}
-          lowStock={lowStock}
-          requests={requests}
-          orders={orders}
-          openRequests={openRequests}
-          riskyProducts={riskyProducts}
-          selectedProductId={selectedProductId}
-          stockDraft={stockDraft}
-          productDraft={productDraft}
-          externalRequestId={externalRequestId}
-          isWorking={isWorking}
-          onSelectProduct={selectProductForEditing}
-          onStockDraftChange={setStockDraft}
-          onProductDraftChange={setProductDraft}
-          onSubmitProduct={submitProduct}
-          onStartNewProduct={startNewProduct}
-          onSubmitStockUpdate={submitStockUpdate}
-          onExternalRequestIdChange={setExternalRequestId}
-          onChangeStatus={changeStatus}
-          onChangeOrderStatus={changeOrderStatus}
-        />
+{isAdmin ? (
+        <>
+          <AdminDashboard
+            rows={rows}
+            lowStock={lowStock}
+            requests={requests}
+            orders={orders}
+            openRequests={openRequests}
+            riskyProducts={riskyProducts}
+            selectedProductId={selectedProductId}
+            stockDraft={stockDraft}
+            productDraft={productDraft}
+            externalRequestId={externalRequestId}
+            isWorking={isWorking}
+            audits={audits}
+            expandedAudit={expandedAudit}
+            onSelectProduct={selectProductForEditing}
+            onStockDraftChange={setStockDraft}
+            onProductDraftChange={setProductDraft}
+            onSubmitProduct={submitProduct}
+            onStartNewProduct={startNewProduct}
+            onSubmitStockUpdate={submitStockUpdate}
+            onExternalRequestIdChange={setExternalRequestId}
+            onChangeStatus={changeStatus}
+            onChangeOrderStatus={changeOrderStatus}
+            onToggleAudit={(id) => setExpandedAudit(expandedAudit === id ? null : id)}
+          />
+        </>
       ) : (
         <SupplierPortal
           requests={requests}
@@ -481,6 +505,8 @@ function AdminDashboard({
   productDraft,
   externalRequestId,
   isWorking,
+  audits,
+  expandedAudit,
   onSelectProduct,
   onStockDraftChange,
   onProductDraftChange,
@@ -490,6 +516,7 @@ function AdminDashboard({
   onExternalRequestIdChange,
   onChangeStatus,
   onChangeOrderStatus,
+  onToggleAudit,
 }: {
   rows: ProductInventoryRow[];
   lowStock: LowStockRecord[];
@@ -502,6 +529,8 @@ function AdminDashboard({
   productDraft: ProductDraft;
   externalRequestId: string;
   isWorking: boolean;
+  audits: Record<number, PredictionAuditRecord | null>;
+  expandedAudit: number | null;
   onSelectProduct: (value: string) => void;
   onStockDraftChange: (draft: StockDraft) => void;
   onProductDraftChange: (draft: ProductDraft) => void;
@@ -511,6 +540,7 @@ function AdminDashboard({
   onExternalRequestIdChange: (value: string) => void;
   onChangeStatus: (requestId: number, status: ProcurementStatus) => void;
   onChangeOrderStatus: (orderId: number, status: OrderStatus) => void;
+  onToggleAudit: (auditId: number) => void;
 }) {
   const selectedRow = rows.find((row) => String(row.product.id) === selectedProductId);
 
@@ -587,10 +617,31 @@ function AdminDashboard({
                     <td>
                       {risk ? (
                         <>
-                          <span className={riskClass(risk.stockoutRisk)}>{risk.stockoutRisk}</span>
+                          <div style={{ display: "flex", gap: "6px", alignItems: "center", flexWrap: "wrap" }}>
+                            <span className={riskClass(risk.stockoutRisk)}>{risk.stockoutRisk}</span>
+                            <span className={modelVersionClass(risk.modelVersion)} style={{ fontSize: "0.7rem" }}>
+                              {risk.modelVersion}
+                            </span>
+                          </div>
                           <p className={styles.finePrint}>
                             {risk.targetDate}: stock {risk.predictedStock}, demand {risk.predictedDemand}
                           </p>
+                          {risk.auditId && (
+                            <button
+                              className={styles.secondaryButton}
+                              style={{ marginTop: "6px", padding: "3px 8px", fontSize: "0.75rem" }}
+                              onClick={() => onToggleAudit(risk.auditId!)}
+                            >
+                              {expandedAudit === risk.auditId ? "Hide AI detail" : "AI detail"}
+                            </button>
+                          )}
+                          {expandedAudit === risk.auditId && audits[row.product.id] && (
+                            <tr>
+                              <td colSpan={4} style={{ padding: "12px 8px", background: "#f9fafb" }}>
+                                <AiDetailPanel audit={audits[row.product.id]!} />
+                              </td>
+                            </tr>
+                          )}
                         </>
                       ) : (
                         <span className={styles.muted}>No forecast yet</span>
@@ -603,6 +654,15 @@ function AdminDashboard({
           </table>
         </div>
       </section>
+
+      {selectedRow && audits[selectedRow.product.id] && (
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>AI Forecast Analysis — {selectedRow.product.title}</h2>
+          </div>
+          <AiDetailPanel audit={audits[selectedRow.product.id]!} />
+        </section>
+      )}
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
@@ -912,6 +972,11 @@ function ProcurementSection({
                 {request.requestedQuantity} units requested from {request.supplierCompanyName ?? "supplier"}.
               </p>
               <p className={styles.finePrint}>{request.triggerReason}</p>
+              {request.dispatchedAt && (
+                <p className={styles.finePrint} style={{ color: "rgb(30 64 175)" }}>
+                  Dispatched: {new Date(request.dispatchedAt).toLocaleString()}
+                </p>
+              )}
               {request.externalRequestId ? (
                 <p className={styles.finePrint}>Reference: {request.externalRequestId}</p>
               ) : null}
@@ -1064,6 +1129,88 @@ function OrderManagement({
         <div className={styles.empty}>No customer orders yet.</div>
       )}
     </section>
+  );
+}
+
+function AiDetailPanel({ audit }: { audit: PredictionAuditRecord }) {
+  const attributionEntries = audit.attribution
+    ? Object.entries(audit.attribution).sort(([, a], [, b]) => b - a)
+    : [];
+
+  const maxAttr = attributionEntries.length > 0 ? Math.max(...attributionEntries.map(([, v]) => v)) : 1;
+
+  return (
+    <div className={styles.aiPanel}>
+      <div className={styles.aiPanelGrid}>
+        <div className={styles.aiPanelCard}>
+          <h4 className={styles.aiPanelCardTitle}>Risk Assessment</h4>
+          <div className={styles.aiPanelRow}>
+            <span className={riskClass(audit.risk_band as StockoutRisk)}>
+              {audit.risk_band ?? "UNKNOWN"}
+            </span>
+            <span className={styles.aiPanelValue}>
+              score {(Number(audit.risk_score) * 100).toFixed(0)}%
+            </span>
+            <span className={styles.aiPanelMeta}>
+              stockout in ~{audit.predicted_stockout_day} days (horizon {audit.horizon_days}d)
+            </span>
+          </div>
+          {audit.procurement_recommendation?.should_trigger && (
+            <div className={styles.aiPanelProcurement}>
+              <span className={styles.aiPanelProcurementLabel}>Procurement triggered</span>
+              <span>
+                Need <strong>{audit.procurement_recommendation.suggested_quantity}</strong> units
+              </span>
+              <span className={styles.aiPanelMeta}>{audit.procurement_recommendation.trigger_reason}</span>
+            </div>
+          )}
+        </div>
+
+        {attributionEntries.length > 0 && (
+          <div className={styles.aiPanelCard}>
+            <h4 className={styles.aiPanelCardTitle}>Feature Attribution</h4>
+            {attributionEntries.map(([feature, weight]) => (
+              <div key={feature} className={styles.aiAttrRow}>
+                <span className={styles.aiAttrLabel}>{feature}</span>
+                <div className={styles.aiAttrBarBg}>
+                  <div
+                    className={styles.aiAttrBar}
+                    style={{ width: `${(Number(weight) / maxAttr) * 100}%` }}
+                  />
+                </div>
+                <span className={styles.aiAttrValue}>{(Number(weight) * 100).toFixed(1)}%</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {audit.counterfactual_stock != null && (
+          <div className={styles.aiPanelCard}>
+            <h4 className={styles.aiPanelCardTitle}>Counterfactual</h4>
+            <p className={styles.aiPanelText}>
+              Stock needed to reduce risk to {Number(audit.counterfactual_risk ?? 0) * 100}%:
+            </p>
+            <p className={styles.aiPanelHighlight}>
+              {audit.counterfactual_stock} units
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className={styles.aiPanelFooter}>
+        <span className={modelVersionClass(audit.model_version)}>{audit.model_version}</span>
+        <span className={styles.aiPanelMeta}>
+          confidence {formatConfidence(audit.confidence_score)} &middot; source: {audit.prediction_source} &middot;{" "}
+          {new Date(audit.created_at).toLocaleString()}
+        </span>
+        {audit.llm_summary_status === "ready" && audit.llm_summary && (
+          <blockquote className={styles.aiPanelQuote}>{audit.llm_summary}</blockquote>
+        )}
+        {audit.llm_summary_status === "pending" && (
+          <p className={styles.aiPanelMeta}>LLM summary: pending...</p>
+        )}
+      </div>
+    </div>
   );
 }
 

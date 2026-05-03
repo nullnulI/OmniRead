@@ -8,6 +8,7 @@ import com.omniread.backend.dto.ForecastSummaryResponse;
 import com.omniread.backend.dto.GenerateForecastRequest;
 import com.omniread.backend.dto.InventoryResponse;
 import com.omniread.backend.dto.LowStockResponse;
+import com.omniread.backend.dto.PredictionAuditResponse;
 import com.omniread.backend.dto.ProcurementResponse;
 import com.omniread.backend.dto.StockUpdateRequest;
 import com.omniread.backend.dto.UpdateProcurementStatusRequest;
@@ -52,6 +53,11 @@ public class InventoryController {
     @GetMapping("/products/{productId}/forecasts")
     public ApiResponse<List<ForecastResponse>> listForecasts(@PathVariable Long productId) {
         return ApiResponse.success(inventoryService.listForecasts(productId));
+    }
+
+    @GetMapping("/products/{productId}/prediction-audit")
+    public ApiResponse<PredictionAuditResponse> getLatestPredictionAudit(@PathVariable Long productId) {
+        return ApiResponse.success(inventoryService.getLatestPredictionAudit(productId));
     }
 
     @PostMapping("/products/{productId}/forecasts/generate")

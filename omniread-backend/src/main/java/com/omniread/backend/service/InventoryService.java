@@ -3,6 +3,7 @@ package com.omniread.backend.service;
 import com.omniread.backend.dto.ForecastResponse;
 import com.omniread.backend.dto.InventoryResponse;
 import com.omniread.backend.dto.LowStockResponse;
+import com.omniread.backend.dto.PredictionAuditResponse;
 import com.omniread.backend.dto.StockUpdateRequest;
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface InventoryService {
     List<LowStockResponse> listLowStockRecords();
 
     List<ForecastResponse> listForecasts(Long productId);
+
+    PredictionAuditResponse getLatestPredictionAudit(Long productId);
 }

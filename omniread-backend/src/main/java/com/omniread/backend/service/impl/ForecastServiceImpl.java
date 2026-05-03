@@ -1,5 +1,6 @@
 package com.omniread.backend.service.impl;
 
+import com.omniread.backend.dto.AiPredictRequest;
 import com.omniread.backend.dto.ForecastResponse;
 import com.omniread.backend.dto.ForecastSummaryResponse;
 import com.omniread.backend.dto.GenerateForecastRequest;
@@ -10,6 +11,8 @@ import com.omniread.backend.entity.enums.StockoutRisk;
 import com.omniread.backend.repository.InventoryRecordRepository;
 import com.omniread.backend.repository.OrderItemRepository;
 import com.omniread.backend.repository.StockoutForecastRepository;
+import com.omniread.backend.service.AiForecastClient;
+import com.omniread.backend.service.AiForecastService;
 import com.omniread.backend.service.ForecastService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,25 +22,43 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ForecastServiceImpl implements ForecastService {
 
-    private static final String MODEL_VERSION = "rules-v1.0";
+    private static final String MODEL_VERSION_RULES = "rules-v1.0";
+    private static final String MODEL_VERSION_AI = "ai-ensemble-v1.0";
 
     private final InventoryRecordRepository inventoryRecordRepository;
     private final OrderItemRepository orderItemRepository;
     private final StockoutForecastRepository stockoutForecastRepository;
+    private final AiForecastClient aiForecastClient;
+    private final AiForecastService aiForecastService;
+
+    @Value("${omniread.ai-service.enabled:false}")
+    private boolean aiEnabled;
 
     @Override
     @Transactional
     public ForecastSummaryResponse generateForProduct(Long productId, GenerateForecastRequest request) {
+        GenerateForecastRequest normalizedRequest = normalize(request);
+
+        if (aiEnabled && tryAiForecast(productId, normalizedRequest)) {
+            return ForecastSummaryResponse.builder()
+                .generatedCount(normalizedRequest.getHorizonDays())
+                .forecasts(List.of())
+                .build();
+        }
+
         InventoryRecord record = inventoryRecordRepository.findByProductId(productId)
             .orElseThrow(() -> new IllegalArgumentException("Inventory record not found: " + productId));
-        List<ForecastResponse> forecasts = generateForecasts(record, normalize(request));
+        List<ForecastResponse> forecasts = generateForecasts(record, normalizedRequest);
         return ForecastSummaryResponse.builder()
             .generatedCount(forecasts.size())
             .forecasts(forecasts)
@@ -58,6 +79,28 @@ public class ForecastServiceImpl implements ForecastService {
             .generatedCount(forecasts.size())
             .forecasts(forecasts)
             .build();
+    }
+
+    private boolean tryAiForecast(Long productId, GenerateForecastRequest request) {
+        try {
+            if (!aiForecastClient.isHealthy()) {
+                log.warn("AI service is not healthy, falling back to rules-v1.0");
+                return false;
+            }
+
+            AiPredictRequest aiRequest = new AiPredictRequest();
+            aiRequest.setProductId(productId);
+            aiRequest.setHorizonDays(request.getHorizonDays());
+            aiRequest.setLookbackDays(request.getLookbackDays());
+
+            aiForecastService.generateForProduct(productId, aiRequest);
+            log.info("AI forecast generated successfully for product: {}", productId);
+            return true;
+        } catch (Exception e) {
+            log.error("AI forecast failed for product: {}, falling back to rules-v1.0: {}",
+                productId, e.getMessage());
+            return false;
+        }
     }
 
     private List<ForecastResponse> generateForecasts(InventoryRecord record, GenerateForecastRequest request) {
@@ -88,7 +131,7 @@ public class ForecastServiceImpl implements ForecastService {
             forecast.setPredictedStock(predictedStock);
             forecast.setStockoutRisk(resolveRisk(predictedStock, record.getSafetyStock(), record.getSupplierLeadTimeDays(), day));
             forecast.setConfidenceScore(resolveConfidence(dailyDemand, day, request.getHorizonDays()));
-            forecast.setModelVersion(MODEL_VERSION);
+            forecast.setModelVersion(MODEL_VERSION_RULES);
             savedForecasts.add(stockoutForecastRepository.save(forecast));
         }
 

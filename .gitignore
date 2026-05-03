@@ -10,6 +10,7 @@ Thumbs.db
 .env.*
 !.env.example
 *.log
+*.err
 
 # Backend
 omniread-backend/target/
@@ -22,6 +23,12 @@ omniread-storefront-main/build/
 omniread-storefront-main/coverage/
 omniread-storefront-main/next-env.d.ts
 omniread-storefront-main/*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
 
 # Local runtime data / tools
 omniread-mysql8-data/

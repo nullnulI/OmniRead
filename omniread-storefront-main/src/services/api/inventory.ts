@@ -4,6 +4,7 @@ import type {
   ForecastSummary,
   InventoryRecord,
   LowStockRecord,
+  PredictionAuditRecord,
   ProcurementRequest,
   ProcurementStatus,
   ProductPayload,
@@ -82,4 +83,8 @@ export async function updateProcurementStatus(
     method: "PUT",
     body: JSON.stringify({ status, externalRequestId }),
   });
+}
+
+export async function fetchPredictionAudit(productId: number): Promise<PredictionAuditRecord | null> {
+  return fetchJson<PredictionAuditRecord | null>(`/inventory/products/${productId}/prediction-audit`);
 }

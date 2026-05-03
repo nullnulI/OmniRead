@@ -1,0 +1,20 @@
+services:
+  ai-forecasting:
+    build: .
+    ports:
+      - "8081:8081"
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:root@host.docker.internal:3307/omniread
+    volumes:
+      - ./models:/app/models:ro
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped

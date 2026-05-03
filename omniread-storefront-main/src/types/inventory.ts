@@ -73,10 +73,46 @@ export interface ForecastRecord {
   stockoutRisk: StockoutRisk;
   confidenceScore: number;
   modelVersion: string;
+  auditId?: number;
 }
 
 export interface ForecastSummary {
   generatedCount: number;
+}
+
+export interface AttributionMap {
+  [feature: string]: number;
+}
+
+export interface CounterfactualInfo {
+  stock_needed: number;
+  risk_reduced_to: number;
+}
+
+export interface ProcurementRecommendationDetail {
+  should_trigger: boolean;
+  trigger_reason: string;
+  suggested_quantity: number;
+}
+
+export interface PredictionAuditRecord {
+  id: number;
+  product_id: number;
+  forecast_date: string;
+  horizon_days: number;
+  model_version: string;
+  predicted_stockout_day: number;
+  risk_score: number;
+  risk_band: string;
+  prediction_source: string;
+  confidence_score: number;
+  attribution: AttributionMap;
+  counterfactual_stock?: number;
+  counterfactual_risk?: number;
+  procurement_recommendation?: ProcurementRecommendationDetail;
+  llm_summary?: string;
+  llm_summary_status: string;
+  created_at: string;
 }
 
 export interface ProcurementRequest {
@@ -92,6 +128,7 @@ export interface ProcurementRequest {
   externalRequestId?: string;
   approvedAt?: string;
   completedAt?: string;
+  dispatchedAt?: string;
 }
 
 export interface StockUpdatePayload {

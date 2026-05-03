@@ -20,6 +20,7 @@ public class ForecastResponse {
     private StockoutRisk stockoutRisk;
     private BigDecimal confidenceScore;
     private String modelVersion;
+    private Long auditId;
 
     public static ForecastResponse from(StockoutForecast forecast) {
         return ForecastResponse.builder()
@@ -32,6 +33,7 @@ public class ForecastResponse {
             .stockoutRisk(forecast.getStockoutRisk())
             .confidenceScore(forecast.getConfidenceScore())
             .modelVersion(forecast.getModelVersion())
+            .auditId(forecast.getAudit() != null ? forecast.getAudit().getId() : null)
             .build();
     }
 }

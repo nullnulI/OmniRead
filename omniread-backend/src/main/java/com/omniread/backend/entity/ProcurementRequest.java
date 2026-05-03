@@ -48,4 +48,7 @@ public class ProcurementRequest extends BaseEntity {
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
+
+    @Column(name = "dispatched_at")
+    private LocalDateTime dispatchedAt;
 }

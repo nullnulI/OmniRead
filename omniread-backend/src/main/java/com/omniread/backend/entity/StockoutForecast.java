@@ -45,4 +45,8 @@ public class StockoutForecast extends BaseEntity {
 
     @Column(name = "model_version", nullable = false, length = 80)
     private String modelVersion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "audit_id")
+    private PredictionAudit audit;
 }
