@@ -8,8 +8,11 @@ import com.omniread.backend.entity.InventoryRecord;
 import com.omniread.backend.entity.StockoutForecast;
 import com.omniread.backend.entity.enums.ProductType;
 import com.omniread.backend.entity.enums.StockoutRisk;
+import com.omniread.backend.entity.PredictionAudit;
 import com.omniread.backend.repository.InventoryRecordRepository;
 import com.omniread.backend.repository.OrderItemRepository;
+import com.omniread.backend.repository.PredictionAuditRepository;
+import com.omniread.backend.repository.ProductRepository;
 import com.omniread.backend.repository.StockoutForecastRepository;
 import com.omniread.backend.service.AiForecastClient;
 import com.omniread.backend.service.AiForecastService;
@@ -21,6 +24,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,6 +44,8 @@ public class ForecastServiceImpl implements ForecastService {
     private final InventoryRecordRepository inventoryRecordRepository;
     private final OrderItemRepository orderItemRepository;
     private final StockoutForecastRepository stockoutForecastRepository;
+    private final PredictionAuditRepository predictionAuditRepository;
+    private final ProductRepository productRepository;
     private final AiForecastClient aiForecastClient;
     private final AiForecastService aiForecastService;
 
@@ -70,13 +78,21 @@ public class ForecastServiceImpl implements ForecastService {
     public ForecastSummaryResponse generateForAllProducts(GenerateForecastRequest request) {
         GenerateForecastRequest normalizedRequest = normalize(request);
         List<ForecastResponse> forecasts = new ArrayList<>();
+        int aiCount = 0;
         for (InventoryRecord record : inventoryRecordRepository.findAll()) {
-            if (record.getProduct().getBookType() != ProductType.EBOOK) {
+            if (record.getProduct().getBookType() == ProductType.EBOOK) {
+                continue;
+            }
+            Long productId = record.getProduct().getId();
+            if (aiEnabled && tryAiForecast(productId, normalizedRequest)) {
+                aiCount++;
+            } else {
                 forecasts.addAll(generateForecasts(record, normalizedRequest));
             }
         }
+        log.info("generateForAllProducts: AI path={}, rules fallback={}", aiCount, forecasts.size());
         return ForecastSummaryResponse.builder()
-            .generatedCount(forecasts.size())
+            .generatedCount(aiCount + forecasts.size())
             .forecasts(forecasts)
             .build();
     }
@@ -111,6 +127,16 @@ public class ForecastServiceImpl implements ForecastService {
         LocalDate forecastDate = LocalDate.now();
         BigDecimal dailyDemand = estimateDailyDemand(record.getProduct().getId(), request.getLookbackDays());
         int predictedStock = record.getQuantityOnHand() - record.getReservedQuantity();
+
+        PredictionAudit audit = new PredictionAudit();
+        audit.setProduct(record.getProduct());
+        audit.setForecastDate(forecastDate);
+        audit.setHorizonDays(request.getHorizonDays());
+        audit.setModelVersion(MODEL_VERSION_RULES);
+        audit.setPredictionSource("fallback");
+        audit.setConfidenceScore(BigDecimal.valueOf(0.55));
+        predictionAuditRepository.save(audit);
+
         List<StockoutForecast> savedForecasts = new ArrayList<>();
 
         for (int day = 1; day <= request.getHorizonDays(); day++) {
@@ -125,6 +151,7 @@ public class ForecastServiceImpl implements ForecastService {
                 .orElseGet(StockoutForecast::new);
 
             forecast.setProduct(record.getProduct());
+            forecast.setAudit(audit);
             forecast.setForecastDate(forecastDate);
             forecast.setTargetDate(targetDate);
             forecast.setPredictedDemand(predictedDemand);
@@ -133,6 +160,14 @@ public class ForecastServiceImpl implements ForecastService {
             forecast.setConfidenceScore(resolveConfidence(dailyDemand, day, request.getHorizonDays()));
             forecast.setModelVersion(MODEL_VERSION_RULES);
             savedForecasts.add(stockoutForecastRepository.save(forecast));
+
+            if (day == 1 && audit.getPredictedStockoutDay() == null) {
+                int firstStockoutDay = predictedStock <= 0 ? 0 : (predictedStock >= record.getQuantityOnHand() ? request.getHorizonDays() : day);
+                audit.setPredictedStockoutDay(BigDecimal.valueOf(firstStockoutDay));
+                BigDecimal risk = BigDecimal.ONE.subtract(BigDecimal.valueOf(firstStockoutDay).divide(BigDecimal.valueOf(request.getHorizonDays()), 4, RoundingMode.HALF_UP));
+                audit.setRiskScore(risk.max(BigDecimal.ZERO).min(BigDecimal.ONE));
+                predictionAuditRepository.save(audit);
+            }
         }
 
         return savedForecasts.stream()
