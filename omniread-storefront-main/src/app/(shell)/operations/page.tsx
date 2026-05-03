@@ -636,11 +636,9 @@ function AdminDashboard({
                             </button>
                           )}
                           {expandedAudit === risk.auditId && audits[row.product.id] && (
-                            <tr>
-                              <td colSpan={4} style={{ padding: "12px 8px", background: "#f9fafb" }}>
-                                <AiDetailPanel audit={audits[row.product.id]!} />
-                              </td>
-                            </tr>
+                            <div style={{ marginTop: "8px", padding: "10px", background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "6px" }}>
+                              <AiDetailPanel audit={audits[row.product.id]!} />
+                            </div>
                           )}
                         </>
                       ) : (
