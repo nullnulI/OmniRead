@@ -135,6 +135,8 @@ public class ForecastServiceImpl implements ForecastService {
         audit.setModelVersion(MODEL_VERSION_RULES);
         audit.setPredictionSource("fallback");
         audit.setConfidenceScore(BigDecimal.valueOf(0.55));
+        audit.setPredictedStockoutDay(BigDecimal.valueOf(request.getHorizonDays()));
+        audit.setRiskScore(BigDecimal.ZERO);
         predictionAuditRepository.save(audit);
 
         List<StockoutForecast> savedForecasts = new ArrayList<>();
@@ -161,7 +163,7 @@ public class ForecastServiceImpl implements ForecastService {
             forecast.setModelVersion(MODEL_VERSION_RULES);
             savedForecasts.add(stockoutForecastRepository.save(forecast));
 
-            if (day == 1 && audit.getPredictedStockoutDay() == null) {
+            if (day == 1) {
                 int firstStockoutDay = predictedStock <= 0 ? 0 : (predictedStock >= record.getQuantityOnHand() ? request.getHorizonDays() : day);
                 audit.setPredictedStockoutDay(BigDecimal.valueOf(firstStockoutDay));
                 BigDecimal risk = BigDecimal.ONE.subtract(BigDecimal.valueOf(firstStockoutDay).divide(BigDecimal.valueOf(request.getHorizonDays()), 4, RoundingMode.HALF_UP));

@@ -2,7 +2,7 @@ service:
   port: 8081
 
 database:
-  url: mysql+pymysql://root:change-me-local-only@localhost:3306/omniread
+  url: mysql+pymysql://root:change-me-local-only@localhost:3307/omniread
 
 models:
   random_forest:

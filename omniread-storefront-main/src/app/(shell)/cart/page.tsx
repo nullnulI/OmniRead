@@ -19,6 +19,7 @@ import { checkoutCart, fetchCartItems, removeCartItem, updateCartItem } from "@/
 function CartPage() {
 
 	const auth = useAuthContext();
+	const isCustomer = auth.user?.metadata.role === "CUSTOMER";
 
 	const [items, setItems] = useState<CartItem[]>();
 	const [loading, setLoading] = useState<boolean>(false);
@@ -26,7 +27,7 @@ function CartPage() {
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!auth?.isAuthenticated) return;
+		if (!auth?.isAuthenticated || !isCustomer) return;
 
 		async function loadItemsInCart() {
 			try {
@@ -43,7 +44,7 @@ function CartPage() {
 		}
 		setLoading(true);
 		loadItemsInCart();
-	}, [auth?.isAuthenticated]) 
+	}, [auth?.isAuthenticated, isCustomer])
 
 	async function handleChangeQuantity(itemId: number, quantity: number) {
 		try {
@@ -78,6 +79,10 @@ function CartPage() {
 
 	if (!auth.isLoading && !auth.isAuthenticated) {
 		return <main className="w-full px-4 py-6 md:px-6 md:py-8">Please login to view your cart.</main>;
+	}
+
+	if (!auth.isLoading && auth.isAuthenticated && !isCustomer) {
+		return <main className="w-full px-4 py-6 md:px-6 md:py-8">Cart is only available for customer accounts.</main>;
 	}
 
 	if (!items || loading) return <main className="w-full px-4 py-6 md:px-6 md:py-8">Loading cart...</main>;

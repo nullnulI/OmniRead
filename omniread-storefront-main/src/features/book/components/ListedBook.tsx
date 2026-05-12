@@ -65,6 +65,10 @@ function ListedBook({ bookId }: Readonly<{ bookId: string }>) {
       setError("Please login before adding books to your cart.");
       return;
     }
+    if (auth.user.metadata.role !== "CUSTOMER") {
+      setError("Only customer accounts can add books to the cart.");
+      return;
+    }
 
     try {
       await addBookToCart(auth.user.metadata.id, bookId, 1);

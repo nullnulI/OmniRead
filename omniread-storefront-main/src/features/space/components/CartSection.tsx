@@ -18,11 +18,15 @@ import { fetchCartItems } from "@/services/api/cart";
 function CartSection() {
 
 	const auth = useAuthContext();
+  const isCustomer = auth.user?.metadata.role === "CUSTOMER";
 
   const [items, setItems] = useState<CartItem[]>();
+  const visibleItems = isCustomer ? items : [];
 
   useEffect(() => {
-    if (!auth?.isAuthenticated) return;
+    if (!auth?.isAuthenticated || !isCustomer) {
+      return;
+    }
 		async function loadCartItems() {
 			try {
 				const data = await fetchCartItems();
@@ -32,7 +36,7 @@ function CartSection() {
 			}
 		}
 		loadCartItems();
-  }, [auth?.isAuthenticated])
+  }, [auth?.isAuthenticated, isCustomer])
 
 	return (
 		<section className="rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm sm:p-7">
@@ -44,11 +48,11 @@ function CartSection() {
 					<h2 className="mt-1 text-2xl font-semibold text-slate-900">Saved for checkout</h2>
 				</div>
 				<span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-					{items?.length ?? 0} items
+					{visibleItems?.length ?? 0} items
 				</span>
 			</div>
 
-			<CartShowcase items={items} />
+			<CartShowcase items={visibleItems} />
 		</section>
 	);
 };

@@ -40,11 +40,12 @@ function statusLabel(status: Order["status"]) {
 
 function OrdersPage() {
 	const auth = useAuthContext();
+	const isCustomer = auth.user?.metadata.role === "CUSTOMER";
 	const [orders, setOrders] = useState<Order[]>();
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!auth.isAuthenticated) return;
+		if (!auth.isAuthenticated || !isCustomer) return;
 
 		async function loadOrders() {
 			setError(null);
@@ -57,13 +58,23 @@ function OrdersPage() {
 		}
 
 		loadOrders();
-	}, [auth.isAuthenticated]);
+	}, [auth.isAuthenticated, isCustomer]);
 
 	if (!auth.isLoading && !auth.isAuthenticated) {
 		return (
 			<main className="w-full px-4 py-6 md:px-6 md:py-8">
 				<p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700">
 					Please login to view your orders.
+				</p>
+			</main>
+		);
+	}
+
+	if (!auth.isLoading && auth.isAuthenticated && !isCustomer) {
+		return (
+			<main className="w-full px-4 py-6 md:px-6 md:py-8">
+				<p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700">
+					Customer orders are only available for customer accounts.
 				</p>
 			</main>
 		);

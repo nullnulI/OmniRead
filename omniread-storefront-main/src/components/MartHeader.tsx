@@ -20,6 +20,7 @@ function MartHeader() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const role = auth.user?.metadata.role;
+  const canUseCustomerActions = !auth.isAuthenticated || role === "CUSTOMER";
   const canUseOperations = role === "INVENTORY_ADMIN" || role === "SYSTEM_ADMIN" || role === "SUPPLIER";
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
@@ -58,16 +59,20 @@ function MartHeader() {
           </Link>
         </div>
       ) : null}
-      <div className={styles.linkGroup}>
-        <Link href="/orders" className={styles.link}>
-          Orders
-        </Link>
-      </div>
-      <div className={styles.linkGroup}>
-        <Link href="/cart" className={styles.link}>
-          Cart
-        </Link>
-      </div>
+      {canUseCustomerActions ? (
+        <>
+          <div className={styles.linkGroup}>
+            <Link href="/orders" className={styles.link}>
+              Orders
+            </Link>
+          </div>
+          <div className={styles.linkGroup}>
+            <Link href="/cart" className={styles.link}>
+              Cart
+            </Link>
+          </div>
+        </>
+      ) : null}
     </header>
   )
 }

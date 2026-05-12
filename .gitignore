@@ -29,7 +29,14 @@ __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
+omniread-ai/venv/
 
 # Local runtime data / tools
 omniread-mysql8-data/
 tools/
+selenium_demo_work/
+
+# Local demo exports
+OmniRead_demo_*
+OmniRead_english_voiceover_*
+OmniRead_5min_demo_script.md
